@@ -26,21 +26,38 @@ namespace finiteElementMethod.Models
 
             List<Point> result = new List<Point>();
 
-            uint zIters = (mZSlices != 0) ? (2 + (mZSlices * 2) - 1) : 2;
-            uint yIters = (mYSlices != 0) ? (2 + (mYSlices * 2) - 1) : 2;
-            uint xIters = (mXSlices != 0) ? (2 + (mXSlices * 2) - 1) : 2;
+            uint zIters = (mZSlices != 0) ? (2 + (mZSlices * 2) - 1) : 3;
+            uint yIters = (mYSlices != 0) ? (2 + (mYSlices * 2) - 1) : 3;
+            uint xIters = (mXSlices != 0) ? (2 + (mXSlices * 2) - 1) : 3;
 
             double xSpacing = (mXSlices != 0) ? ((mWidth / mXSlices) / 2) : 1;
             double ySpacing = (mYSlices != 0) ? ((mDepth / mYSlices) / 2) : 1;
             double zSpacing = (mZSlices != 0) ? ((mHeight / mZSlices) / 2) : 1;
-
+            
             for (uint z = 0; z < zIters; z++)
             {
                 for (uint y = 0; y < yIters; y++)
                 {
                     for (uint x = 0; x < xIters; x++)
                     {
-                        result.Add(new Point(x * xSpacing, y * ySpacing, z * zSpacing, ((x % 2 != 0) || (y % 2 != 0) || (z % 2 != 0))));
+                        int checker = 0;
+                        if (x % 2 != 0)
+                        {
+                            ++checker;
+                        }
+                        if (y % 2 != 0)
+                        {
+                            ++checker;
+                        }
+                        if (z % 2 != 0)
+                        {
+                            ++checker;
+                        }
+
+                        if (checker < 2)
+                        {
+                            result.Add(new Point(x * xSpacing, y * ySpacing, z * zSpacing, (checker == 1)));
+                        }
                     }
                 }
             }
