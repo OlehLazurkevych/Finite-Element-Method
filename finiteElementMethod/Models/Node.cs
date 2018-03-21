@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace finiteElementMethod.Models
+﻿namespace finiteElementMethod.Models
 {
-    class Point
+    class Node
+        // Node is simply a point in space with a lable
     {
         /*  Private members  */
         private double mX;
@@ -15,7 +10,7 @@ namespace finiteElementMethod.Models
         private bool mIsIntermediate;
 
         /*  Constructors  */
-        public Point()
+        public Node()
         {
             mX = 0;
             mY = 0;
@@ -23,7 +18,7 @@ namespace finiteElementMethod.Models
             mIsIntermediate = false;
         }
 
-        public Point(double x, double y, double z)
+        public Node(double x, double y, double z)
         {
             mX = x;
             mY = y;
@@ -31,7 +26,7 @@ namespace finiteElementMethod.Models
             mIsIntermediate = false;
         }
 
-        public Point(double x, double y, double z, bool isIntermediate)
+        public Node(double x, double y, double z, bool isIntermediate)
         {
             mX = x;
             mY = y;

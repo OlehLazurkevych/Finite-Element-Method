@@ -1,42 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace finiteElementMethod.Models
 {
     class ExObject
+        // Experemental Object dividet by slices
     {
         /*  Private members  */
         private double mWidth;  // Section on X axis
-        private double mDepth;  // Section on Y axis
-        private double mHeight; // Section on Z axis
-        private List<Point> mPoints = new List<Point>();
+        private double mHeight;  // Section on Y axis
+        private double mDepth; // Section on Z axis
+        private List<Node> mNodes = new List<Node>();
 
         private uint mXSlices = 0;
         private uint mYSlices = 0;
         private uint mZSlices = 0;
 
         /*  Private functionality  */
-        private List<Point> GeneratePoints()
+        private List<Node> GenNodes()
         {
-            // Generating points on slice crossings of a rectangle,
-            // also creates intermediate points between generated points.
+            // Generating nodes on slice crossings of a object,
+            // also creates intermediate nodes between generated points.
 
-            List<Point> result = new List<Point>();
+            List<Node> result = new List<Node>();
 
             uint zIters = (mZSlices != 0) ? (2 + (mZSlices * 2) - 1) : 3;
             uint yIters = (mYSlices != 0) ? (2 + (mYSlices * 2) - 1) : 3;
             uint xIters = (mXSlices != 0) ? (2 + (mXSlices * 2) - 1) : 3;
 
             double xSpacing = (mXSlices != 0) ? ((mWidth / mXSlices) / 2) : 1;
-            double ySpacing = (mYSlices != 0) ? ((mDepth / mYSlices) / 2) : 1;
-            double zSpacing = (mZSlices != 0) ? ((mHeight / mZSlices) / 2) : 1;
+            double ySpacing = (mYSlices != 0) ? ((mHeight / mYSlices) / 2) : 1;
+            double zSpacing = (mZSlices != 0) ? ((mDepth / mZSlices) / 2) : 1;
             
-            for (uint z = 0; z < zIters; z++)
+            for (uint y = 0; y < yIters; y++)
             {
-                for (uint y = 0; y < yIters; y++)
+                for (uint z = 0; z < zIters; z++)
                 {
                     for (uint x = 0; x < xIters; x++)
                     {
@@ -56,7 +53,7 @@ namespace finiteElementMethod.Models
 
                         if (checker < 2)
                         {
-                            result.Add(new Point(x * xSpacing, y * ySpacing, z * zSpacing, (checker == 1)));
+                            result.Add(new Node(x * xSpacing, z * zSpacing, y * ySpacing, (checker == 1)));
                         }
                     }
                 }
@@ -71,18 +68,18 @@ namespace finiteElementMethod.Models
             // Empty
         }
 
-        public ExObject(double width, double depth, double height)
+        public ExObject(double width, double height, double depth)
         {
             mWidth = width;
-            mDepth = depth;
             mHeight = height;
+            mDepth = depth;
         }
 
-        public ExObject(double width, double depth, double height, uint xSclices, uint ySclices, uint zSclices)
+        public ExObject(double width, double height, double depth, uint xSclices, uint ySclices, uint zSclices)
         {
             mWidth = width;
-            mDepth = depth;
-            mHeight = height;
+            mHeight = depth;
+            mDepth = height;
 
             mXSlices = xSclices;
             mYSlices = ySclices;
@@ -100,24 +97,11 @@ namespace finiteElementMethod.Models
             set
             {
                 mWidth = value;
-                GeneratePoints();
-            }
-        }
-        public double Depth
-            // Section on Y axis
-        {
-            get
-            {
-                return mDepth;
-            }
-            set
-            {
-                mDepth = value;
-                GeneratePoints();
+                GenNodes();
             }
         }
         public double Height
-            // Section on Z axis
+            // Section on Y axis
         {
             get
             {
@@ -126,18 +110,31 @@ namespace finiteElementMethod.Models
             set
             {
                 mHeight = value;
-                GeneratePoints();
+                GenNodes();
             }
         }
-        public List<Point> Points
+        public double Depth
+            // Section on Z axis
         {
             get
             {
-                return mPoints;
+                return mDepth;
             }
             set
             {
-                mPoints = value;
+                mDepth = value;
+                GenNodes();
+            }
+        }
+        public List<Node> Nodes
+        {
+            get
+            {
+                return mNodes;
+            }
+            set
+            {
+                mNodes = value;
             }
         }
 
@@ -151,10 +148,10 @@ namespace finiteElementMethod.Models
             set
             {
                 mXSlices = value;
-                GeneratePoints();
+                GenNodes();
             }
         }
-        public uint DepthSlices
+        public uint HeightSlices
             // Quantity of slices on section on Y axis
         {
             get
@@ -164,10 +161,10 @@ namespace finiteElementMethod.Models
             set
             {
                 mYSlices = value;
-                GeneratePoints();
+                GenNodes();
             }
         }
-        public uint HeightSlices
+        public uint DepthSlices
             // Quantity of slices on section on Z axis
         {
             get
@@ -177,7 +174,7 @@ namespace finiteElementMethod.Models
             set
             {
                 mZSlices = value;
-                GeneratePoints();
+                GenNodes();
             }
         }
     }
