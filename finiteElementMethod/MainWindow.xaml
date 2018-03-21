@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:finiteElementMethod"
+        xmlns:views="clr-namespace:finiteElementMethod.Views"
         mc:Ignorable="d"
         Title="Finite Element Method In Action" Height="730" Width="1130" ResizeMode="NoResize">
     <Window.Background>
@@ -13,6 +14,14 @@
         </LinearGradientBrush>
     </Window.Background>
     <Grid>
-        
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="540"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <views:ExObjectView Grid.Column="1"/>
+
     </Grid>
 </Window>

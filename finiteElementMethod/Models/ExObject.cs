@@ -73,6 +73,8 @@ namespace finiteElementMethod.Models
             mWidth = width;
             mHeight = height;
             mDepth = depth;
+
+            mNodes = GenNodes();
         }
 
         public ExObject(double width, double height, double depth, uint xSclices, uint ySclices, uint zSclices)
@@ -84,6 +86,8 @@ namespace finiteElementMethod.Models
             mXSlices = xSclices;
             mYSlices = ySclices;
             mZSlices = zSclices;
+
+            mNodes = GenNodes();
         }
 
         /*  Properties  */
@@ -97,7 +101,7 @@ namespace finiteElementMethod.Models
             set
             {
                 mWidth = value;
-                GenNodes();
+                mNodes = GenNodes();
             }
         }
         public double Height
@@ -110,7 +114,7 @@ namespace finiteElementMethod.Models
             set
             {
                 mHeight = value;
-                GenNodes();
+                mNodes = GenNodes();
             }
         }
         public double Depth
@@ -123,7 +127,7 @@ namespace finiteElementMethod.Models
             set
             {
                 mDepth = value;
-                GenNodes();
+                mNodes = GenNodes();
             }
         }
         public List<Node> Nodes
@@ -148,7 +152,7 @@ namespace finiteElementMethod.Models
             set
             {
                 mXSlices = value;
-                GenNodes();
+                mNodes = GenNodes();
             }
         }
         public uint HeightSlices
@@ -161,7 +165,7 @@ namespace finiteElementMethod.Models
             set
             {
                 mYSlices = value;
-                GenNodes();
+                mNodes = GenNodes();
             }
         }
         public uint DepthSlices
@@ -174,7 +178,7 @@ namespace finiteElementMethod.Models
             set
             {
                 mZSlices = value;
-                GenNodes();
+                mNodes = GenNodes();
             }
         }
     }
