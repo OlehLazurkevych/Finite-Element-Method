@@ -10,6 +10,7 @@ namespace finiteElementMethod.Models
         private double mHeight;  // Section on Y axis
         private double mDepth; // Section on Z axis
         private List<Node> mNodes = new List<Node>();
+        private List<List<int>> mNT = new List<List<int>>();
 
         private uint mXSlices = 0;
         private uint mYSlices = 0;
@@ -62,6 +63,47 @@ namespace finiteElementMethod.Models
             return result;
         }
 
+        private List<List<int>> GenNT()
+        {
+            List<List<int>> result = new List<List<int>>();
+
+            //for (int y = 0; y < mYSlices + 1; y++)
+            //{
+            //    for (int z = 0; z < mZSlices + 1; z++)
+            //    {
+            //        for (int x = 0; x < mXSlices + 1; x++)
+            //        {
+            //            List<int> nodes = new List<int>(20);
+
+            //            nodes[0] = 0;
+            //            nodes[1] = 0;
+            //            nodes[2] = 0;
+            //            nodes[3] = 0;
+            //            nodes[4] = 0;
+            //            nodes[5] = 0;
+            //            nodes[6] = 0;
+            //            nodes[7] = 0;
+            //            nodes[8] = 0;
+            //            nodes[9] = 0;
+            //            nodes[10] = 0;
+            //            nodes[11] = 0;
+            //            nodes[12] = 0;
+            //            nodes[13] = 0;
+            //            nodes[14] = 0;
+            //            nodes[15] = 0;
+            //            nodes[16] = 0;
+            //            nodes[17] = 0;
+            //            nodes[18] = 0;
+            //            nodes[19] = 0;
+
+            //            result.Add(nodes);
+            //        }
+            //    }
+            //}
+
+            return result;
+        }
+
         /*  Constructors  */
         public ExObject()
         {
@@ -75,6 +117,7 @@ namespace finiteElementMethod.Models
             mDepth = depth;
 
             mNodes = GenNodes();
+            mNT = GenNT();
         }
 
         public ExObject(double width, double height, double depth, uint xSclices, uint ySclices, uint zSclices)
@@ -88,6 +131,7 @@ namespace finiteElementMethod.Models
             mZSlices = zSclices;
 
             mNodes = GenNodes();
+            mNT = GenNT();
         }
 
         /*  Properties  */
@@ -102,6 +146,7 @@ namespace finiteElementMethod.Models
             {
                 mWidth = value;
                 mNodes = GenNodes();
+                mNT = GenNT();
             }
         }
         public double Height
@@ -115,6 +160,7 @@ namespace finiteElementMethod.Models
             {
                 mHeight = value;
                 mNodes = GenNodes();
+                mNT = GenNT();
             }
         }
         public double Depth
@@ -128,6 +174,7 @@ namespace finiteElementMethod.Models
             {
                 mDepth = value;
                 mNodes = GenNodes();
+                mNT = GenNT();
             }
         }
         public List<Node> Nodes
@@ -139,6 +186,14 @@ namespace finiteElementMethod.Models
             set
             {
                 mNodes = value;
+            }
+        }
+        public List<List<int>> NT
+            // Matrix  of connectivity
+        {
+            get
+            {
+                return mNT;
             }
         }
 
@@ -153,6 +208,7 @@ namespace finiteElementMethod.Models
             {
                 mXSlices = value;
                 mNodes = GenNodes();
+                mNT = GenNT();
             }
         }
         public uint HeightSlices
@@ -166,6 +222,7 @@ namespace finiteElementMethod.Models
             {
                 mYSlices = value;
                 mNodes = GenNodes();
+                mNT = GenNT();
             }
         }
         public uint DepthSlices
@@ -179,6 +236,7 @@ namespace finiteElementMethod.Models
             {
                 mZSlices = value;
                 mNodes = GenNodes();
+                mNT = GenNT();
             }
         }
     }

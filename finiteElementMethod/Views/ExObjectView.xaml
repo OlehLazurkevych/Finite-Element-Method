@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:finiteElementMethod.Views"
              mc:Ignorable="d" 
              d:DesignHeight="730" d:DesignWidth="540">
-    <Grid>
+    <Grid Name="sceneGrid" Width="540" Height="730">
         <Viewport3D Name="sceneViewport">
 
             <!-- Camera -->
@@ -16,7 +16,7 @@
 						LookDirection="0, 0, 1" 
 						UpDirection="0, 1, 0" 
 						NearPlaneDistance="1" 
-						Position="0, 5, -15" 
+						Position="0, 0, -13" 
 						FieldOfView="45"/>
             </Viewport3D.Camera>
 
@@ -30,7 +30,11 @@
             <!-- Objects -->
             <ModelVisual3D>
                 <ModelVisual3D.Content>
-                    <Model3DGroup x:Name="objGroup"/>
+                    <Model3DGroup x:Name="objGroup">
+                        <Model3DGroup.Transform>
+                            <Transform3DGroup x:Name="objTransformGroup"/>
+                        </Model3DGroup.Transform>
+                    </Model3DGroup>
                 </ModelVisual3D.Content>
             </ModelVisual3D>
 

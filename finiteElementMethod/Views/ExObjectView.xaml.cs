@@ -14,6 +14,7 @@ using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using finiteElementMethod.Models;
+using System.Windows.Media.Animation;
 
 namespace finiteElementMethod.Views
 {
@@ -27,16 +28,43 @@ namespace finiteElementMethod.Views
             InitializeComponent();
 
             ExObject obj = new ExObject(4, 8, 4, 5, 5, 5);
+            
+            objGroup.Children.Add(GetCubeMode((obj.Nodes[0].X - (obj.Width / 2)) * (-1), obj.Nodes[0].Y - (obj.Depth / 2), obj.Nodes[0].Z - (obj.Height / 2), 0.1, Color.FromArgb(255, 50, 50, 50)));
+            objGroup.Children.Add(GetCubeMode((obj.Nodes[obj.Nodes.Count - 1].X - (obj.Width / 2)) * (-1), obj.Nodes[obj.Nodes.Count - 1].Y - (obj.Depth / 2), obj.Nodes[obj.Nodes.Count - 1].Z - (obj.Height / 2), 0.1, Color.FromArgb(255, 50, 50, 50)));
 
-            foreach (var node in obj.Nodes)
+            for (int i=1; i<obj.Nodes.Count - 1; i++)
             {
-                double width = (node.IsIntermediate) ? 0.05: 0.1;
-                Model3DGroup cube = GetCubeMode(node.X - (obj.Width / 2), node.Y, node.Z - (obj.Depth / 2), width);
+                double width = (obj.Nodes[i].IsIntermediate) ? 0.05 : 0.1;
+                Model3DGroup cube = GetCubeMode((obj.Nodes[i].X - (obj.Width / 2)) * (-1), obj.Nodes[i].Y - (obj.Depth / 2), obj.Nodes[i].Z - (obj.Height / 2), width, Color.FromArgb(255, 200, 50, 50));
                 objGroup.Children.Add(cube);
             }
+
+            // ReadY
+            //foreach (var node in obj.Nodes)
+            //{
+            //    double width = (node.IsIntermediate) ? 0.05: 0.1;
+            //    Model3DGroup cube = GetCubeMode((node.X - (obj.Width / 2)) * (-1), node.Y - (obj.Depth / 2), node.Z - (obj.Height / 2), width, Color.FromArgb(255, 200, 50, 50));
+            //    objGroup.Children.Add(cube);
+            //}
+
+            //Model3DGroup cubeC = GetCubeMode(0, 0, 0, 0.5, Color.FromArgb(255, 50, 50, 50));
+            //objGroup.Children.Add(cubeC);
+
+            
+
+            RotateTransform3D myRotateTransform = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(1, 0, 1), 180));
+            
+            Vector3DAnimation myVectorAnimation = new Vector3DAnimation(new Vector3D(0, 0, 0.5), new Duration(TimeSpan.FromSeconds(40)));
+            myVectorAnimation.AccelerationRatio = 0.1;
+            myVectorAnimation.DecelerationRatio = 0.1;
+            myVectorAnimation.RepeatBehavior = RepeatBehavior.Forever;
+
+            myRotateTransform.Rotation.BeginAnimation(AxisAngleRotation3D.AxisProperty, myVectorAnimation);
+            
+            objTransformGroup.Children.Add(myRotateTransform);
         }
 
-        public Model3DGroup GetCubeMode(double x, double y, double z, double width)
+        public Model3DGroup GetCubeMode(double x, double y, double z, double width, Color color)
         {
             Model3DGroup cube = new Model3DGroup();
             GeometryModel3D side1 = new GeometryModel3D();
@@ -227,7 +255,7 @@ namespace finiteElementMethod.Views
             side6Plane.TextureCoordinates.Add(new Point(0, 1));
 
             //Set Brush property for the Material applied to each face
-            SolidColorBrush brush = new SolidColorBrush(Color.FromArgb(255, 200, 50, 50));
+            SolidColorBrush brush = new SolidColorBrush(color);
 
             DiffuseMaterial side1Material = new DiffuseMaterial(brush);
             DiffuseMaterial side2Material = new DiffuseMaterial(brush);
