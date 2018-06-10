@@ -1,7 +1,9 @@
 ﻿namespace finiteElementMethod.Models
 {
-    class Node
-        // Node is simply a point in space with a lable
+    /*
+     *  Node is simply a point in space with a lable
+     */
+    public class Node
     {
         /*  Private members  */
         private double mX;
@@ -55,5 +57,28 @@
             get { return mIsIntermediate; }
             set { mIsIntermediate = value; }
         }
+    }
+
+    /*
+     *  Data model for pressure definition on certain side of a finite element
+     */
+    public class ZPValue
+    {
+        /*  Constructors  */
+        public ZPValue()
+        {
+            // Empty
+        }
+        public ZPValue(int elNum, int sizNum, double force)
+        {
+            FinElemNumber = elNum;
+            SideNumber = sizNum;
+            PressureForce = force;
+        }
+
+        /*  Properties  */
+        public int FinElemNumber { get; set; }
+        public int SideNumber { get; set; }
+        public double PressureForce { get; set; }
     }
 }

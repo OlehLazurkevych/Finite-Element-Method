@@ -57,6 +57,9 @@
     <Compile Include="Views\ExObjectView.xaml.cs">
       <DependentUpon>ExObjectView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\NTWindow.xaml.cs">
+      <DependentUpon>NTWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -70,6 +73,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\ExObjectView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\NTWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
