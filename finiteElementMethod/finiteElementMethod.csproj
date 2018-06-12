@@ -54,6 +54,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Externals\External.cs" />
+    <Compile Include="Externals\FunctionsForFee.cs" />
+    <Compile Include="Externals\GaussianCalculator.cs" />
+    <Compile Include="Externals\StandartElement.cs" />
+    <Compile Include="Models\FEM.cs" />
     <Compile Include="Views\ExObjectView.xaml.cs">
       <DependentUpon>ExObjectView.xaml</DependentUpon>
     </Compile>

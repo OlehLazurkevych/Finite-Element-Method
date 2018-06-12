@@ -18,13 +18,18 @@
         private int mYSlices = 0;
         private int mZSlices = 0;
 
+        private const double E = 1.0; // Module Unga
+        private double mV;            // Coefficient Pausonna of material
+        private double mLamda;
+        private double mMu;           // Coefficient Liame
+
         private List<Node> mAKT = new List<Node>(); // Represents the Experimental Object by nodes which are stored in global indexation
         private List<List<int>> mNT = new List<List<int>>(); // Matrix which represents a local indexation of nodes
 
         private List<int> mZU = new List<int>(); // List of fixed nodes
         private List<ZPValue> mZP = new List<ZPValue>(); // List of finite elements which have some pressure on their side
 
-        private const double FORCE = 0.3;
+        private const double FORCE = 10.0;
 
         /*  Private functionality  */
         /*
@@ -180,7 +185,7 @@
             
             for(int i = start; i < start + xyEms; i++)
             {
-                result.Add(new ZPValue(i, 6, FORCE));
+                result.Add(new ZPValue(i, 5, FORCE));
             }
 
             return result;
@@ -192,19 +197,7 @@
             // Empty
         }
 
-        public ExObject(double width, double length, double height)
-        {
-            mWidth = width;
-            mLength = length;
-            mHeight = height;
-
-            mAKT = GenAKT(mWidth, mLength, mHeight, 0, 0, 0);
-            mNT = GenNT(0, 0, 0);
-            mZU = GenZU();
-            mZP = GenZP();
-        }
-
-        public ExObject(double width, double length, double height, int xSclices, int ySclices, int zSclices)
+        public ExObject(double width, double length, double height, int xSclices, int ySclices, int zSclices, double materialStrength)
         {
             mWidth = width;
             mLength = length;
@@ -216,6 +209,11 @@
 
             mAKT = GenAKT(mWidth, mLength, mHeight, mXSlices, mYSlices, mZSlices);
             mNT = GenNT(mXSlices, mYSlices, mZSlices);
+
+            mV = materialStrength;
+            mLamda = E / ((1 + mV) * (1 - 2 * mV));
+            mMu = E / (2 * (1 + mV));
+
             mZU = GenZU();
             mZP = GenZP();
         }
@@ -326,6 +324,50 @@
             get
             {
                 return mZP;
+            }
+            private set
+            {
+                // Empty
+            }
+        }
+        public double v // Coefficient Pausonna of material
+        {
+            get
+            {
+                return mV;
+            }
+            private set
+            {
+                // Empty
+            }
+        }
+        public double Lamda
+        {
+            get
+            {
+                return mLamda;
+            }
+            private set
+            {
+                // Empty
+            }
+        }
+        public double Mu // Coefficient Liame
+        {
+            get
+            {
+                return mMu;
+            }
+            private set
+            {
+                // Empty
+            }
+        }
+        public int nel // Finite element quantity
+        {
+            get
+            {
+                return (mXSlices + 1) * (mYSlices + 1) * (mZSlices + 1);
             }
             private set
             {
