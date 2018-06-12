@@ -355,7 +355,7 @@ namespace finiteElementMethod.Models
         private void updateMGMatrix()
         {
             int index;
-            for (int i = 0; i < mExperementalObject.ZU.Capacity; i++)
+            for (int i = 0; i < mExperementalObject.ZU.Count; i++)
             {
                 index = mExperementalObject.ZU[i] * 3;
                 for (int j = 0; j < 3; j++)

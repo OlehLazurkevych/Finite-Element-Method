@@ -49,6 +49,15 @@ namespace finiteElementMethod.Views
 
             objTransformGroup.Children.Add(myRotateTransform);
 
+            fem.RunSimulation();
+
+            foreach (var node in fem.DefformatedObject)
+            {
+                double width = (node.IsIntermediate) ? 0.05 : 0.1;
+                byte opacity = (node.IsIntermediate) ? (byte)100 : (byte)255;
+                Model3DGroup cube = GetCubeMode(node.X - (obj.Width / 2), node.Z - (obj.Height / 2), node.Y - (obj.Length / 2), width, Color.FromArgb(opacity, 50, 50, 50));
+                objGroup.Children.Add(cube);
+            }
         }
 
         public Model3DGroup GetCubeMode(double x, double y, double z, double width, Color color)
