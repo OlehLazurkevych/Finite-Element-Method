@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
 
     /*
      *  Experimental Object represented by nodes in space

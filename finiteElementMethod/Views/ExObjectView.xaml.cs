@@ -28,6 +28,7 @@ namespace finiteElementMethod.Views
             InitializeComponent();
 
             ExObject obj = new ExObject(5, 5, 5, 1, 1, 1, 0.3);
+            FEM fem = new FEM(obj);
             
             foreach (var node in obj.AKT)
             {

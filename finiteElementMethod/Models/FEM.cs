@@ -14,7 +14,12 @@ namespace finiteElementMethod.Models
 
         public double[,,] DFIABG = External.GenDFIABG();
         public double[,] MG;
-        public double[] F;
+        public double[] Fources;
+        public double[,,] DPSITE = External.GenDPSITE();
+        public double[,] PSIET;
+
+        private double[] LinEquationResult;
+        public List<Node> DefformatedObject = new List<Node>();
 
         /*   Private functionality   */
         /*
@@ -347,14 +352,136 @@ namespace finiteElementMethod.Models
             return res;
         }
 
+        private void updateMGMatrix()
+        {
+            int index;
+            for (int i = 0; i < mExperementalObject.ZU.Capacity; i++)
+            {
+                index = mExperementalObject.ZU[i] * 3;
+                for (int j = 0; j < 3; j++)
+                {
+                    MG[index + j, index + j] = Math.Pow(10, 20);
+                }
+            }
+        }
+
+        private void createPSI()
+        {
+            PSIET = new double[8, 9];
+
+            double[] values;
+            double[][] nodes = External.lilGaussNodes;
+
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    values = nodes[j];
+                    PSIET[i, j] = FunctionsForPSI.CalculatePSI(i, values[0], values[1]);
+                }
+            }
+        }
+
+        private void createF()
+        {
+            double[,,] DXYZET;
+            int cubeSide = 5;
+
+            int loadElementsCount = mExperementalObject.WidthSlices * mExperementalObject.LengthSlices;
+            int start = mExperementalObject.nel - loadElementsCount;
+            for (int number = start; number < mExperementalObject.nel; number++)
+            {
+                DXYZET = new double[3, 2, 9];
+
+                List<int> coordinates = mExperementalObject.NT[number];
+
+                // Generatinng DXYZET
+                double glbCoordinate = 0;
+                double dPSI = 0;
+                double sum = 0;
+                
+                for (int gl = 0; gl < 3; gl++) // Global coords
+                {
+                    for (int loc = 0; loc < 2; loc++) // Local coords
+                    {
+                        for (int n = 0; n < 9; n++) // Gaussian nodes
+                        {
+                            sum = 0;
+                            for (int f = 0; f < 8; f++) // Functions
+                            {
+                                switch (gl)
+                                {
+                                    case 0: glbCoordinate = mExperementalObject.AKT[coordinates[relPoss[cubeSide][f]]].X; break;
+                                    case 1: glbCoordinate = mExperementalObject.AKT[coordinates[relPoss[cubeSide][f]]].Y; break;
+                                    case 2: glbCoordinate = mExperementalObject.AKT[coordinates[relPoss[cubeSide][f]]].Z; break;
+                                }
+                                dPSI = DPSITE[n, loc, f];
+                                sum += glbCoordinate * dPSI;
+                            }
+                            DXYZET[gl, loc, n] = sum;
+                        }
+                    }
+                }
+                
+                double presure = -0.3;
+                double[] f2 = new double[8];
+
+                for (int i = 0; i < 8; i++)
+                {
+                    sum = 0;
+                    int counter = 0;
+                    for (int m = 0; m < 3; m++)
+                    {
+                        for (int n = 0; n < 3; n++)
+                        {
+                            sum += presure *
+                                (DXYZET[0, 0, counter] * DXYZET[1, 1, counter] - DXYZET[1, 0, counter] * DXYZET[0, 1, counter]) *
+                                PSIET[i, counter]
+                                * c[n] * c[m];
+                            ++counter;
+                        }
+                    }
+                    f2[i] = sum;
+                }
+
+                for (int i = 0; i < 8; i++)
+                {
+                    Fources[coordinates[relPoss[cubeSide][i]] * 3 + 2] += f2[i];
+                }
+            }
+        }
+
+        private void getResult()
+        {
+            LinEquationResult = GaussianCalculator.Calculate(MG, Fources);
+            
+            for (int i = 0; i < mExperementalObject.AKT.Count; i++)
+            {
+                Node prev = mExperementalObject.AKT[i];
+                double[] point = LinEquationResult.Skip(i * 3).Take(3).ToArray();
+                DefformatedObject.Add(new Node(Math.Round(prev.X + point[0], 4), Math.Round(prev.Y + point[1], 4), Math.Round(prev.Z + point[2], 4)));
+            }
+        }
+
         /*   Constructors   */
         public FEM(ExObject obj)
         {
             mExperementalObject = obj;
+
+            MG = new double[3 * mExperementalObject.AKT.Count, 3 * mExperementalObject.AKT.Count];
+            Fources = new double[3 * mExperementalObject.AKT.Count];
         }
 
         /*   Public functionality   */
-
+        public void RunSimulation()
+        {
+            GenMGMatrix();
+            updateMGMatrix();
+            createPSI();
+            createF();
+            getResult();
+            //createPressureVector();
+        }
 
         /*   Properties   */
         public ExObject ExperementalObject
@@ -370,5 +497,13 @@ namespace finiteElementMethod.Models
         }
 
         public double[] c = new double[3] { 5.0 / 9.0, 8.0 / 9.0, 5.0 / 9.0 };
+        public int[][] relPoss = new int[6][] {
+            new int[8] { 0, 1, 5, 4, 8, 13, 16, 12},
+            new int[8] { 1, 2, 6, 5, 9, 14, 17, 13},
+            new int[8] { 2, 3, 7, 6, 10, 15, 18, 14 },
+            new int[8] { 3, 0, 4, 7, 11, 12, 19, 15},
+            new int[8] { 0, 1, 2, 3, 8, 9, 10, 11},
+            new int[8] { 4, 5, 6, 7, 16, 17, 18, 19}
+        };
     }
 }
