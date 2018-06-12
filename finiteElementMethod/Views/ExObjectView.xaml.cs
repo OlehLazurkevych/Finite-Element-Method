@@ -27,16 +27,8 @@ namespace finiteElementMethod.Views
         {
             InitializeComponent();
 
-            ExObject obj = new ExObject(5, 5, 5, 1, 1, 1, 0.3);
+            ExObject obj = new ExObject(5, 5, 5, 3, 3, 3, 0.3);
             FEM fem = new FEM(obj);
-            
-            foreach (var node in obj.AKT)
-            {
-                double width = (node.IsIntermediate) ? 0.05 : 0.1;
-                byte opacity = (node.IsIntermediate) ? (byte)100 : (byte)255;
-                Model3DGroup cube = GetCubeMode(node.X - (obj.Width / 2), node.Z - (obj.Height / 2), node.Y - (obj.Length / 2), width, Color.FromArgb(opacity, 225, 50, 50));
-                objGroup.Children.Add(cube);
-            }
             
             RotateTransform3D myRotateTransform = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(1, 0, 1), 180));
 
@@ -53,9 +45,9 @@ namespace finiteElementMethod.Views
 
             foreach (var node in fem.DefformatedObject)
             {
-                double width = (node.IsIntermediate) ? 0.05 : 0.1;
-                byte opacity = (node.IsIntermediate) ? (byte)100 : (byte)255;
-                Model3DGroup cube = GetCubeMode(node.X - (obj.Width / 2), node.Z - (obj.Height / 2), node.Y - (obj.Length / 2), width, Color.FromArgb(opacity, 50, 50, 50));
+                double width = (node.Key.IsIntermediate) ? 0.05 : 0.1;
+                byte opacity = (node.Key.IsIntermediate) ? (byte)100 : (byte)255;
+                Model3DGroup cube = GetCubeMode(node.Key.X - (obj.Width / 2), (node.Key.Z - (obj.Height / 2)) * (-1), node.Key.Y - (obj.Length / 2), width, Color.FromArgb(opacity, (byte)(100 + node.Value * 50), (byte)(255 - node.Value * 50), 150));
                 objGroup.Children.Add(cube);
             }
         }

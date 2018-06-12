@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using finiteElementMethod.Externals;
-
-namespace finiteElementMethod.Models
+﻿namespace finiteElementMethod.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using finiteElementMethod.Externals;
+
     public class FEM
     {
         /*   Private members   */
@@ -19,7 +17,7 @@ namespace finiteElementMethod.Models
         public double[,] PSIET;
 
         private double[] LinEquationResult;
-        public List<Node> DefformatedObject = new List<Node>();
+        public List<KeyValuePair<Node, double>> DefformatedObject = new List<KeyValuePair<Node, double>>();
 
         /*   Private functionality   */
         /*
@@ -459,7 +457,7 @@ namespace finiteElementMethod.Models
             {
                 Node prev = mExperementalObject.AKT[i];
                 double[] point = LinEquationResult.Skip(i * 3).Take(3).ToArray();
-                DefformatedObject.Add(new Node(Math.Round(prev.X + point[0], 4), Math.Round(prev.Y + point[1], 4), Math.Round(prev.Z + point[2], 4)));
+                DefformatedObject.Add(new KeyValuePair<Node, double>(new Node(Math.Round(prev.X + point[0], 4), Math.Round(prev.Y + point[1], 4), Math.Round(prev.Z + point[2], 4), prev.IsIntermediate), Math.Round(prev.Z + point[2], 4)));
             }
         }
 
