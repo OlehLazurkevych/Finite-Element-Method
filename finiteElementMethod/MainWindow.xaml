@@ -75,7 +75,7 @@
 
             <StackPanel Orientation="Horizontal" Height="25" >
                 <TextBlock Width="45">Force:</TextBlock>
-                <Slider Name="PressureSlider" Minimum="-1" Maximum="1" Width="220"/>
+                <Slider Name="PressureSlider" Minimum="-0.1" Maximum="0.1" Width="220"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Height="25" >
                 <TextBlock Width="45">Type:</TextBlock>

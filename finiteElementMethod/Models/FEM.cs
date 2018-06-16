@@ -421,32 +421,6 @@
                         }
                     }
                 }
-                
-                //double presure = -0.3;
-                //double[] f2 = new double[8];
-
-                //for (int i = 0; i < 8; i++)
-                //{
-                //    sum = 0;
-                //    int counter = 0;
-                //    for (int m = 0; m < 3; m++)
-                //    {
-                //        for (int n = 0; n < 3; n++)
-                //        {
-                //            sum += presure *
-                //                (DXYZET[0, 0, counter] * DXYZET[1, 1, counter] - DXYZET[1, 0, counter] * DXYZET[0, 1, counter]) *
-                //                PSIET[i, counter]
-                //                * c[n] * c[m];
-                //            ++counter;
-                //        }
-                //    }
-                //    f2[i] = sum;
-                //}
-                
-                //for (int i = 0; i < 8; i++)
-                //{
-                //    Fources[coordinates[relPoss[cubeSide][i]] * 3 + 2] += f2[i];
-                //}
             }
 
             for (int i = 0; i < mExperementalObject.ZP.Count; i++)  
