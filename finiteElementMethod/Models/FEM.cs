@@ -15,6 +15,7 @@
         public double[] Fources;
         public double[,,] DPSITE = External.GenDPSITE();
         public double[,] PSIET;
+        public double[,,] DFIABG_P = External.GenDFIABG_P();
 
         private double[] LinEquationResult;
         public List<KeyValuePair<Node, double>> DefformatedObject = new List<KeyValuePair<Node, double>>();
@@ -421,31 +422,38 @@
                     }
                 }
                 
-                double presure = -0.3;
-                double[] f2 = new double[8];
+                //double presure = -0.3;
+                //double[] f2 = new double[8];
 
-                for (int i = 0; i < 8; i++)
-                {
-                    sum = 0;
-                    int counter = 0;
-                    for (int m = 0; m < 3; m++)
-                    {
-                        for (int n = 0; n < 3; n++)
-                        {
-                            sum += presure *
-                                (DXYZET[0, 0, counter] * DXYZET[1, 1, counter] - DXYZET[1, 0, counter] * DXYZET[0, 1, counter]) *
-                                PSIET[i, counter]
-                                * c[n] * c[m];
-                            ++counter;
-                        }
-                    }
-                    f2[i] = sum;
-                }
+                //for (int i = 0; i < 8; i++)
+                //{
+                //    sum = 0;
+                //    int counter = 0;
+                //    for (int m = 0; m < 3; m++)
+                //    {
+                //        for (int n = 0; n < 3; n++)
+                //        {
+                //            sum += presure *
+                //                (DXYZET[0, 0, counter] * DXYZET[1, 1, counter] - DXYZET[1, 0, counter] * DXYZET[0, 1, counter]) *
+                //                PSIET[i, counter]
+                //                * c[n] * c[m];
+                //            ++counter;
+                //        }
+                //    }
+                //    f2[i] = sum;
+                //}
+                
+                //for (int i = 0; i < 8; i++)
+                //{
+                //    Fources[coordinates[relPoss[cubeSide][i]] * 3 + 2] += f2[i];
+                //}
+            }
 
-                for (int i = 0; i < 8; i++)
-                {
-                    Fources[coordinates[relPoss[cubeSide][i]] * 3 + 2] += f2[i];
-                }
+            for (int i = 0; i < mExperementalObject.ZP.Count; i++)  
+            {
+                Fources[i * 3 + 0] = mExperementalObject.ZP[i].X;
+                Fources[i * 3 + 1] = mExperementalObject.ZP[i].Y;
+                Fources[i * 3 + 2] = mExperementalObject.ZP[i].Z;
             }
         }
 
@@ -457,8 +465,172 @@
             {
                 Node prev = mExperementalObject.AKT[i];
                 double[] point = LinEquationResult.Skip(i * 3).Take(3).ToArray();
-                DefformatedObject.Add(new KeyValuePair<Node, double>(new Node(Math.Round(prev.X + point[0], 4), Math.Round(prev.Y + point[1], 4), Math.Round(prev.Z + point[2], 4), prev.IsIntermediate), Math.Round(prev.Z + point[2], 4)));
+                DefformatedObject.Add(new KeyValuePair<Node, double>(new Node(Math.Round(prev.X + point[0], 4), Math.Round(prev.Y + point[1], 4), Math.Round(prev.Z + point[2], 4), prev.IsIntermediate), 0));
             }
+        }
+
+        private void TENSORCalculation()
+        {
+            // One for each finite element
+            double[,,] dxyzabg = new double[3, 3, 20];
+            double[,,] dfixyz = new double[20, 20, 3];
+            double[,,] duxyz = new double[20, 3, 3];
+
+            double[][,] SUM = new double[mExperementalObject.AKT.Count][,];
+            for (int i = 0; i < mExperementalObject.AKT.Count; i++)
+            {
+                SUM[i] = new double[3, 3];
+            }
+
+            double[][] sigma = new double[mExperementalObject.AKT.Count][];
+            
+            double[] amount = new double[mExperementalObject.AKT.Count];
+            List<int> coordinates = new List<int>();
+
+            // Get number of entries for each node
+            for (int number = 0; number < mExperementalObject.nel; number++)
+            {
+                coordinates = mExperementalObject.NT[number];
+                for (int j = 0; j < 20; j++)
+                {
+                    amount[coordinates[j]]++;
+                }
+            }
+
+            // Fill sum matrix
+            for (int number = 0; number < mExperementalObject.nel; number++)
+            {
+                coordinates = mExperementalObject.NT[number];
+
+                // Generating dxyzabg
+                double globalCoordinate = 0;
+                double diFi = 0;
+                double sum = 0;
+                
+                for (int i = 0; i < 3; i++) // Global coords
+                {
+                    for (int j = 0; j < 3; j++) // Local goords
+                    {
+                        for (int n = 0; n < 20; n++) // Gaussian Nodes
+                        {
+                            sum = 0;
+                            for (int f = 0; f < 20; f++) // Functions
+                            {
+                                switch(i)
+                                {
+                                    case 0: globalCoordinate = mExperementalObject.AKT[coordinates[f]].X; break;
+                                    case 1: globalCoordinate = mExperementalObject.AKT[coordinates[f]].Y; break;
+                                    case 2: globalCoordinate = mExperementalObject.AKT[coordinates[f]].Z; break;
+                                }
+                                diFi = DFIABG_P[n, j, f];
+                                sum += globalCoordinate * diFi;
+                            }
+                            dxyzabg[i, j, n] = sum;
+                        }
+                    }
+                }
+
+                // Get dfixyz
+                // col is free column
+                double[] col = new double[3];
+                for (int i = 0; i < 20; i++) // Gaussian Nodes
+                {
+                    for (int phi = 0; phi < 20; phi++) // Functions
+                    {
+                        for (int k = 0; k < 3; k++)
+                        {
+                            col[k] = DFIABG_P[i, k, phi];
+                        }
+                        double[,] matrix = new double[3, 3] {
+                            { dxyzabg[0,0,i], dxyzabg[1,0,i], dxyzabg[2,0,i] },
+                            { dxyzabg[0,1,i], dxyzabg[1,1,i], dxyzabg[2,1,i] },
+                            { dxyzabg[0,2,i], dxyzabg[1,2,i], dxyzabg[2,2,i] }
+                        };
+                        double[] gaussianSolve = GaussianCalculator.Calculate(matrix, col);
+
+                        for (int k = 0; k < 3; k++)
+                        {
+                            dfixyz[i, phi, k] = gaussianSolve[k];
+                        }
+                    }
+                }
+
+                // Get duxyz
+                for (int i = 0; i < 20; i++)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        for (int k = 0; k < 3; k++)
+                        {
+                            sum = 0;
+                            for (int l = 0; l < 20; l++)
+                            {
+                                sum += LinEquationResult[coordinates[l] * 3 + j] * dfixyz[i, l, k];
+                            }
+                            duxyz[i, j, k] = sum;
+                        }
+                    }
+                }
+
+                // Get all sums: in each global point add all 9 values
+                for (int i = 0; i < 20; i++)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        for (int k = 0; k < 3; k++)
+                        {
+                            SUM[coordinates[i]][j, k] += duxyz[i, j, k];
+                        }
+                    }
+                }
+            }
+
+            // Get the avarage for each point
+            for (int i = 0; i < mExperementalObject.AKT.Count; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    for (int k = 0; k < 3; k++)
+                    {
+                        SUM[i][j, k] /= amount[i];
+                    }
+                }
+            }
+
+            for (int i = 0; i < mExperementalObject.AKT.Count; i++)
+            {
+                sigma[i] = CalculateSigma(SUM[i]);
+            }
+
+            for (int i = 0; i < mExperementalObject.AKT.Count; i++)
+            {
+                DefformatedObject[i] = new KeyValuePair<Node, double>(DefformatedObject[i].Key, GetNodePreasure(sigma[i]).Sum());
+            }
+        }
+
+        private double[] CalculateSigma(double[,] u)
+        {
+            double[] result = new double[6];
+
+            result[0] = mExperementalObject.Lamda * ((1 - mExperementalObject.v) * u[0, 0] + mExperementalObject.v * (u[1, 1] + u[2, 2]));
+            result[1] = mExperementalObject.Lamda * ((1 - mExperementalObject.v) * u[1, 1] + mExperementalObject.v * (u[0, 0] + u[2, 2]));
+            result[2] = mExperementalObject.Lamda * ((1 - mExperementalObject.v) * u[2, 2] + mExperementalObject.v * (u[0, 0] + u[1, 1]));
+            result[3] = mExperementalObject.Mu * (u[0, 1] + u[1, 0]);
+            result[4] = mExperementalObject.Mu * (u[1, 2] + u[2, 1]);
+            result[5] = mExperementalObject.Mu * (u[0, 2] + u[2, 0]);
+
+            return result;
+        }
+
+        private double[] GetNodePreasure(double[] sigma)
+        {
+            double[] result = new double[3];
+
+            result[0] = sigma[0] + sigma[1] + sigma[2];
+            result[1] = sigma[0] * sigma[1] + sigma[0] * sigma[2] + sigma[1] * sigma[2] - (Math.Pow(sigma[3], 2) + Math.Pow(sigma[4], 2) + Math.Pow(sigma[5], 2));
+            result[2] = sigma[0] * sigma[1] * sigma[2] + 2 * sigma[3] * sigma[4] * sigma[5] - (sigma[0] * Math.Pow(sigma[4], 2) + sigma[1] * Math.Pow(sigma[5], 2) + sigma[2] * Math.Pow(sigma[3], 2));
+
+            return result;
         }
 
         /*   Constructors   */
@@ -478,7 +650,7 @@
             createPSI();
             createF();
             getResult();
-            //createPressureVector();
+            TENSORCalculation();
         }
 
         /*   Properties   */

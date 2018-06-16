@@ -46,6 +46,25 @@
             return result;
         }
 
+        public static double[,,] GenDFIABG_P()
+        {
+            double[,,] result = new double[20, 3, 20];
+            double[][] nodes = new StandartElement(-1, 0, 1).InlineArr();
+            
+            for (int n = 0; n < 20; n++) // Nodes in standart element
+            {
+                for (int loc = 0; loc < 3; loc++) // Local variables
+                {
+                    for (int f = 0; f < 20; f++) // Functions
+                    {
+                        result[n, loc, f] = FunctionsForFee.CalculateDFee(loc, f, nodes[n][0], nodes[n][1], nodes[n][2]);
+                    }
+                }
+            }
+
+            return result;
+        }
+
         private static double[][] GenLilGaussianNodes()
         {
             double[][] res = new double[9][];

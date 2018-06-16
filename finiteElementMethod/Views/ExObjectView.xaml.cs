@@ -26,10 +26,12 @@ namespace finiteElementMethod.Views
         public ExObjectView()
         {
             InitializeComponent();
+        }
 
-            ExObject obj = new ExObject(5, 5, 5, 3, 3, 3, 0.3);
-            FEM fem = new FEM(obj);
-            
+        public ExObjectView(ExObject obj)
+        {
+            InitializeComponent();
+
             RotateTransform3D myRotateTransform = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(1, 0, 1), 180));
 
             Vector3DAnimation myVectorAnimation = new Vector3DAnimation(new Vector3D(0, 0, 0.5), new Duration(TimeSpan.FromSeconds(40)));
@@ -40,14 +42,38 @@ namespace finiteElementMethod.Views
             myRotateTransform.Rotation.BeginAnimation(AxisAngleRotation3D.AxisProperty, myVectorAnimation);
 
             objTransformGroup.Children.Add(myRotateTransform);
+            
+            foreach (var node in obj.AKT)
+            {
+                double width = (node.IsIntermediate) ? 0.05 : 0.1;
+                byte opacity = (node.IsIntermediate) ? (byte)100 : (byte)255;
+                Model3DGroup cube = GetCubeMode(node.X - (obj.Width / 2), (node.Z - (obj.Height / 2)) * (-1), node.Y - (obj.Length / 2), width, Color.FromArgb(opacity, 55, 200, 0));
+                objGroup.Children.Add(cube);
+            }
+        }
 
-            fem.RunSimulation();
+        public ExObjectView(List<KeyValuePair<Node, double>> obj, double Width, double Length, double Height)
+        {
+            InitializeComponent();
 
-            foreach (var node in fem.DefformatedObject)
+            RotateTransform3D myRotateTransform = new RotateTransform3D(new AxisAngleRotation3D(new Vector3D(1, 0, 1), 180));
+
+            Vector3DAnimation myVectorAnimation = new Vector3DAnimation(new Vector3D(0, 0, 0.5), new Duration(TimeSpan.FromSeconds(40)));
+            myVectorAnimation.AccelerationRatio = 0.1;
+            myVectorAnimation.DecelerationRatio = 0.1;
+            myVectorAnimation.RepeatBehavior = RepeatBehavior.Forever;
+
+            myRotateTransform.Rotation.BeginAnimation(AxisAngleRotation3D.AxisProperty, myVectorAnimation);
+
+            objTransformGroup.Children.Add(myRotateTransform);
+            
+            foreach (var node in obj)
             {
                 double width = (node.Key.IsIntermediate) ? 0.05 : 0.1;
                 byte opacity = (node.Key.IsIntermediate) ? (byte)100 : (byte)255;
-                Model3DGroup cube = GetCubeMode(node.Key.X - (obj.Width / 2), (node.Key.Z - (obj.Height / 2)) * (-1), node.Key.Y - (obj.Length / 2), width, Color.FromArgb(opacity, (byte)(100 + node.Value * 50), (byte)(255 - node.Value * 50), 150));
+                double preasure = Math.Abs(node.Value);
+                byte scaleCol = (byte)((preasure * 400 > 200) ? 200 : preasure * 400);
+                Model3DGroup cube = GetCubeMode(node.Key.X - (Width / 2), (node.Key.Z - (Height / 2)) * (-1), node.Key.Y - (Length / 2), width, Color.FromArgb(opacity, (byte)(55 + scaleCol), (byte)(200 - scaleCol), 0));
                 objGroup.Children.Add(cube);
             }
         }

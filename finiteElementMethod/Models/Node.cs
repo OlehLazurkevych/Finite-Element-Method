@@ -69,16 +69,16 @@
         {
             // Empty
         }
-        public ZPValue(int elNum, int sizNum, double force)
+        public ZPValue(double x, double y, double z)
         {
-            FinElemNumber = elNum;
-            SideNumber = sizNum;
-            PressureForce = force;
+            Z = z;
+            Y = y;
+            Z = z;
         }
 
         /*  Properties  */
-        public int FinElemNumber { get; set; }
-        public int SideNumber { get; set; }
-        public double PressureForce { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Z { get; set; }
     }
 }

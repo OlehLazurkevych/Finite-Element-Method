@@ -28,7 +28,8 @@
         private List<int> mZU = new List<int>(); // List of fixed nodes
         private List<ZPValue> mZP = new List<ZPValue>(); // List of finite elements which have some pressure on their side
 
-        private const double FORCE = 10.0;
+        private double mForce;
+        private double mT;
 
         /*  Private functionality  */
         /*
@@ -179,14 +180,74 @@
         {
             List<ZPValue> result = new List<ZPValue>();
 
-            int xyEms = (mXSlices + 1) * (mYSlices + 1);
-            int start = mZSlices * xyEms;
-            
-            for(int i = start; i < start + xyEms; i++)
+            int z = (mZSlices != 0) ? (2 * (mZSlices + 2) - 1) : 3;
+            int y = (mYSlices != 0) ? (2 * (mYSlices + 2) - 1) : 3;
+
+            int zPointsBigLey = (2 * (2 + mXSlices) - 1) * (2 + mYSlices) + (2 + mXSlices) * (1 + mYSlices);
+            int zPointsSmallLey = (2 + mXSlices) * (2 + mYSlices);
+
+            int zPoints = (int)Math.Ceiling(z / 2.0) * zPointsBigLey + (int)Math.Floor(z / 2.0) * zPointsSmallLey;
+
+            int yPointsBigVec = 2 * (2 + mXSlices) - 1;
+            int yPointsSmallVec = 2 + mXSlices;
+
+            int yPoints;
+            if ((z % 2 != 0) && (z != 0))
             {
-                result.Add(new ZPValue(i, 5, FORCE));
+                yPoints = (int)Math.Floor(y / 2.0) * yPointsSmallVec;
+            }
+            else
+            {
+                yPoints = (int)Math.Ceiling(y / 2.0) * yPointsBigVec + (int)Math.Floor(y / 2.0) * yPointsSmallVec;
             }
 
+            int begin = 0;
+
+            for (int i = 0; i < z - 1; i++) 
+            {
+                for (int j = 0; j < zPoints; i++) 
+                {
+                    result.Add(new ZPValue(0, 0, 0));
+                    ++begin;
+                }
+            }
+
+            switch (mT)
+            {
+                case 0: // Top uniformly
+                    {
+                        for (int i = begin; i < begin + zPoints; i++) 
+                        {
+                            result.Add(new ZPValue(0, 0, mForce));
+                        }
+                    }break;
+                case 1: // Top side
+                    {
+
+                    }
+                    break;
+                case 2: // Top corner
+                    {
+
+                    }
+                    break;
+                case 3: // Top mid
+                    {
+
+                    }
+                    break;
+                case 4: // Side side
+                    {
+
+                    }
+                    break;
+                case 5: // Side corner
+                    {
+
+                    }
+                    break;
+            }
+            
             return result;
         }
 
@@ -196,7 +257,7 @@
             // Empty
         }
 
-        public ExObject(double width, double length, double height, int xSclices, int ySclices, int zSclices, double materialStrength)
+        public ExObject(double width, double length, double height, int xSclices, int ySclices, int zSclices, double materialStrength, double force, int T)
         {
             mWidth = width;
             mLength = length;
@@ -212,6 +273,9 @@
             mV = materialStrength;
             mLamda = E / ((1 + mV) * (1 - 2 * mV));
             mMu = E / (2 * (1 + mV));
+
+            mT = T;
+            mForce = force;
 
             mZU = GenZU();
             mZP = GenZP();
